@@ -14,7 +14,7 @@ while(1):
 
     _, THRESHimg1 = cv.threshold(GRAYimg1, 85, 255, cv.THRESH_BINARY)
 
-    A7 = cv.CascadeClassifier('A7stage5.xml')
+    A7 = cv.CascadeClassifier('A7stage2.xml')
     A7Front = A7.detectMultiScale(GRAYimg1, 1.3, 5)
 
 
