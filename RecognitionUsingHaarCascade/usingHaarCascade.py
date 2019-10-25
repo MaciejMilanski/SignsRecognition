@@ -5,11 +5,12 @@ import numpy as np
 def printRectangle(sign, image, index, offsetx, offsety): # offsets are needed to change start point of coordinate system, becouse we want ot print rectangle on full size image, but we hav coordinate from croped image
     for (x, y, w, h) in sign:
         cv.rectangle(image, (x + offsetx, y + offsety), (x + offsetx + w, y + offsety + h), (0, 0, 255), 10)
-        roi_color = image[y:y + h, x:x + w]
         print(index)
 
-
-
+def cropText(sign, image, offsetx, offsety):
+    for (x, y, w, h) in sign:
+        croppedText = image[y:y + h, x: x + w]
+        cv.imshow('cropped text', croppedText)
 
 cap = cv.VideoCapture(0)
 #warning signs
@@ -31,8 +32,11 @@ while(1):
 
 
     # Take each frame
-    _, BGRimg1 = cap.read()
+    #_, BGRimg1 = cap.read()
+    BGRimg1 = cv.imread('image.jpg', 1)
+    cv.imshow('RecognitionRGB', BGRimg1)
     BGRimg1 = cv.resize(BGRimg1,(800,640))
+
     # Convert BGR to GRAY
     GRAYimg1 = cv.cvtColor(BGRimg1,cv.COLOR_BGR2GRAY)
     #crop image
@@ -66,8 +70,9 @@ while(1):
 
     cv.imshow('cropGRAYimg1', cropGRAYimg1)
     cv.imshow('RecognitionRGB', BGRimg1)
+    cropText(speed_limit_10, cropGRAYimg1, cropX, cropY)
     k = cv.waitKey(5) & 0xFF
     if k == 27:
         break
-
+    cv.waitKey(9999)
 cv.destroyAllWindows()
