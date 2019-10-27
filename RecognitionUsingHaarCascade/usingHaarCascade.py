@@ -1,5 +1,6 @@
 import cv2 as cv
 import numpy as np
+from PIL import ImageOps
 
 
 def printRectangle(sign, image, index, offsetx, offsety): # offsets are needed to change start point of coordinate system, becouse we want ot print rectangle on full size image, but we hav coordinate from croped image
@@ -7,10 +8,20 @@ def printRectangle(sign, image, index, offsetx, offsety): # offsets are needed t
         cv.rectangle(image, (x + offsetx, y + offsety), (x + offsetx + w, y + offsety + h), (0, 0, 255), 10)
         print(index)
 
-def cropText(sign, image, offsetx, offsety):
+def cropSign(sign, image, offsetx, offsety):
     for (x, y, w, h) in sign:
-        croppedText = image[y:y + h, x: x + w]
-        cv.imshow('cropped text', croppedText)
+        croppedSign = image[y + offsety : y + offsety + h, x + offsetx : x + offsetx + w]
+        cv.imshow('cropped text', croppedSign)
+        return croppedSign
+
+def filter(image):
+    HSVimage = cv.cvtColor(image,cv.COLOR_BGR2HSV)
+    lowBlack = np.array([0, 0, 0])
+    highBlack = np.array([255, 255, 120])
+    mask = cv.inRange(HSVimage, lowBlack, highBlack)
+    #mask = ImageOps.invert(mask)
+    cv.imshow('mask', mask)
+    return mask
 
 cap = cv.VideoCapture(0)
 #warning signs
@@ -55,6 +66,8 @@ while(1):
     speed_limit_30 = speed_limit_30_cascade.detectMultiScale(cropGRAYimg1, 1.3, 5)
     speed_limit_40 = speed_limit_40_cascade.detectMultiScale(cropGRAYimg1, 1.3, 5)
 
+    cropSignImg = cropSign(speed_limit_10, BGRimg1, cropX, cropY)
+    filter(cropSignImg)
     #warning signs
     printRectangle(A7, BGRimg1, "A7", cropX, cropY)
 
@@ -70,7 +83,6 @@ while(1):
 
     cv.imshow('cropGRAYimg1', cropGRAYimg1)
     cv.imshow('RecognitionRGB', BGRimg1)
-    cropText(speed_limit_10, cropGRAYimg1, cropX, cropY)
     k = cv.waitKey(5) & 0xFF
     if k == 27:
         break
